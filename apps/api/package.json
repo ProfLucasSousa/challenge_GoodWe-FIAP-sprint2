@@ -1,0 +1,57 @@
+{
+  "name": "@ev-chargeops/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "lint": "eslint src prisma test --max-warnings 0",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.seed.json --noEmit",
+    "test": "jest --runInBand",
+    "test:e2e": "jest --config test/jest-e2e.json --runInBand",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "demo:seed": "tsx prisma/seed.ts && tsx prisma/demo-history.ts",
+    "demo:reset": "tsx prisma/demo-reset.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@ev-chargeops/shared": "workspace:*",
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.1.6",
+    "@nestjs/swagger": "^11.2.1",
+    "@prisma/client": "^6.16.3",
+    "bcryptjs": "^3.0.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "dotenv": "^17.2.3",
+    "helmet": "^8.1.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/testing": "^11.1.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.7.2",
+    "@types/express": "^5.0.3",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "prisma": "^6.16.3",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6"
+  }
+}
