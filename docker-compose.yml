@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: chargeops
+      POSTGRES_USER: chargeops
+      POSTGRES_PASSWORD: chargeops
+    ports:
+      - '5432:5432'
+    volumes:
+      - chargeops_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U chargeops -d chargeops']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      WEB_ORIGIN: http://localhost:8080
+      DATABASE_URL: postgresql://chargeops:chargeops@postgres:5432/chargeops?schema=public
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET com pelo menos 32 caracteres}
+      CHARGER_PROVIDER: ${CHARGER_PROVIDER:-mock}
+      DEMO_MODE: ${DEMO_MODE:-false}
+      GOODWE_SEMS_USERNAME: ${GOODWE_SEMS_USERNAME:-}
+      GOODWE_SEMS_PASSWORD: ${GOODWE_SEMS_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      [
+        'sh',
+        '-c',
+        'pnpm --filter @ev-chargeops/api exec prisma db push --skip-generate && pnpm --filter @ev-chargeops/api start',
+      ]
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - '8080:80'
+    depends_on:
+      - api
+
+volumes:
+  chargeops_postgres:
