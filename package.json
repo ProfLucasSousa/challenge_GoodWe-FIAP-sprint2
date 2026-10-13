@@ -4,7 +4,10 @@
   "private": true,
   "packageManager": "pnpm@10.18.3",
   "scripts": {
-    "dev": "pnpm --filter @ev-chargeops/shared build && pnpm --parallel --filter @ev-chargeops/api --filter @ev-chargeops/web dev",
+    "dev": "node scripts/dev.mjs",
+    "dev:apps": "pnpm --filter @ev-chargeops/shared build && pnpm --parallel --filter @ev-chargeops/api --filter @ev-chargeops/web dev",
+    "dev:prepare": "node scripts/dev.mjs --prepare-only",
+    "dev:stop": "docker compose stop postgres",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm --filter @ev-chargeops/shared build && pnpm -r typecheck",

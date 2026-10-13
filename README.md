@@ -433,6 +433,32 @@ As demais páginas existem como interface navegável, mas várias ainda usam con
 
 A visão operacional do carregador mostra status, modelo, potência nominal, potência atual, energia, corrente, tensão, atualização e gráfico de leituras quando esses dados existem. Cada métrica é identificada como `REAL`, `MOCK`, `CALCULATED` ou indisponível.
 
+## Capturas de tela
+
+### Login
+
+A porta de entrada do portal permite autenticação com e-mail e senha. Quando `VITE_ENABLE_DEMO=true`, também exibe o acesso ao modo de demonstração visual.
+
+![Tela de login do EV ChargeOps](<imgs/Captura de tela 2026-10-13 152550.png>)
+
+### Visão geral da operação
+
+O dashboard autenticado consolida energia, sessões, disponibilidade dos carregadores, falhas e valor rateado, além de gráficos de consumo e uso por horário.
+
+![Dashboard autenticado com o resumo da operação](<imgs/Captura de tela 2026-10-13 152519.png>)
+
+### Dashboard demonstrativo
+
+No modo DEMO, a interface identifica explicitamente os dados `MOCK` e apresenta um histórico fictício mais amplo para demonstrar os indicadores e gráficos do produto.
+
+![Parte superior do dashboard no modo de demonstração](<imgs/Captura de tela 2026-10-13 153122.png>)
+
+### Rateio e insights
+
+A continuação do dashboard apresenta utilização versus ociosidade, consumo por unidade, sessões recentes, origem dos dados e insights explicáveis. Os valores desta captura pertencem ao modo DEMO.
+
+![Rateio, sessões e insights no modo de demonstração](<imgs/Captura de tela 2026-10-13 153202.png>)
+
 ## Segurança
 
 Medidas implementadas:
@@ -556,21 +582,55 @@ No PowerShell:
 
 ```powershell
 Copy-Item .env.example .env
-docker compose up -d postgres
-pnpm install
-pnpm db:generate
-pnpm --filter @ev-chargeops/api exec prisma db push
-pnpm db:seed
-pnpm dev
+pnpm.cmd install
 ```
 
-Antes do seed, defina no `.env` um `JWT_SECRET` com pelo menos 32 caracteres e um `SEED_ADMIN_PASSWORD` com pelo menos 12 caracteres.
+Antes de iniciar, defina no `.env` um `JWT_SECRET` com pelo menos 32 caracteres e um `SEED_ADMIN_PASSWORD` com pelo menos 12 caracteres. Para carregar automaticamente os dados fictícios, mantenha `DEMO_MODE=true`.
+
+Depois da instalação inicial, um único comando prepara e inicia todo o ambiente de desenvolvimento:
+
+```powershell
+pnpm.cmd dev
+```
+
+Esse comando:
+
+1. inicia o PostgreSQL pelo Docker Compose e aguarda o health check;
+2. sincroniza o schema do Prisma com o banco;
+3. executa o seed idempotente quando `DEMO_MODE=true`;
+4. inicia a API NestJS e o frontend Vite em modo watch.
+
+O Docker Desktop precisa estar aberto. Para encerrar API e frontend, pressione `Ctrl+C`. O PostgreSQL permanece ativo para as próximas execuções; para pará-lo, use:
+
+```powershell
+pnpm.cmd dev:stop
+```
 
 Serviços locais:
 
 - Web: `http://localhost:5173`
 - API: `http://localhost:3000/api`
 - Swagger: `http://localhost:3000/api/docs`
+
+## Credenciais locais
+
+O seed cria um único usuário com senha conhecida:
+
+| Campo  | Valor                                    |
+| ------ | ---------------------------------------- |
+| E-mail | `admin@chargeops.local`                  |
+| Senha  | valor de `SEED_ADMIN_PASSWORD` no `.env` |
+| Perfil | `ADMIN`                                  |
+
+Exemplo de configuração local:
+
+```dotenv
+JWT_SECRET=substitua-por-um-segredo-local-com-32-caracteres
+SEED_ADMIN_PASSWORD=senhaDeTeste
+DEMO_MODE=true
+```
+
+Com esse exemplo, o login é `admin@chargeops.local` / `senhaDeTeste`. Essas credenciais são exclusivamente locais e não devem ser usadas em produção. Os demais usuários fictícios recebem senhas aleatórias bloqueadas e não possuem credenciais públicas. O botão **Explorar demonstração**, quando habilitado por `VITE_ENABLE_DEMO=true`, abre somente o modo visual e não autentica na API.
 
 ## Variáveis de ambiente
 
@@ -610,7 +670,7 @@ A aplicação fica em `http://localhost:8080`. O Nginx entrega a SPA e encaminha
 Seed base:
 
 ```powershell
-pnpm db:seed
+pnpm.cmd db:seed
 ```
 
 Ele cria dados fictícios e idempotentes: administrador local, três unidades DEMO, cinco usuários no total, veículos BEV/PHEV, RFIDs, três HCA G2 simulados, tarifa, sessões, leitura, fatura, sincronização e auditoria. A única senha configurável é a do administrador, fornecida localmente por `SEED_ADMIN_PASSWORD`.
@@ -618,7 +678,7 @@ Ele cria dados fictícios e idempotentes: administrador local, três unidades DE
 Histórico de demonstração:
 
 ```powershell
-pnpm demo:seed
+pnpm.cmd demo:seed
 ```
 
 Esse comando executa o seed base e gera três meses de histórico, com 12 sessões MOCK por mês, três leituras por sessão e faturas fictícias. As operações usam upsert/chaves externas para permitir repetição sem duplicar sessões e leituras.
@@ -628,7 +688,7 @@ O seed base e os scripts DEMO exigem `DEMO_MODE=true` e recusam execução quand
 Para remover dados DEMO/MOCK e preservar registros GoodWe/REAL:
 
 ```powershell
-pnpm demo:reset
+pnpm.cmd demo:reset
 ```
 
 ## Testes
@@ -710,7 +770,5 @@ As páginas que usam dados locais devem ser apresentadas como protótipo visual,
 
 ## Autores
 
-- Nome: ______________________________ — RM: __________________
-- Nome: ______________________________ — RM: __________________
-- Nome: ______________________________ — RM: __________________
-- Nome: ______________________________ — RM: __________________
+Lucas Sousa — RM: 573029
+Dayse Borges de Sousa — RM: 573036
